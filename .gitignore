@@ -47,4 +47,6 @@ package/
 .codex*
 .claude
 .mimocode
-GitHub_Pages构建源修复.md
+
+# 本地资料文档（说明书/教程/Cloud.md/Agent.md 等非重要资料，不进仓库）
+gitignore/

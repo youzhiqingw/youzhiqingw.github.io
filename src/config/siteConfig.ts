@@ -46,7 +46,7 @@ export const siteConfig: SiteConfig = {
 	subtitle: "君の指先を舞ってる電光は、私の一生変わらない信仰であり、このレールガンだけが永遠に生きてる！",
 
 	// 站点 URL
-	site_url: "https://youzhiqingw.github.io",
+	site_url: "https://blog.youzhiqing.com",
 
 	// 站点描述
 	description:
