@@ -1,61 +1,60 @@
-# ============================================================================
-# 此工作流已停用（2026-08-22）
-# 原因：博客已改用 Cloudflare 云端编译部署，GitHub 仅作为代码仓库。
-# 以下内容已全部注释，不再自动触发编译。
-# 如需恢复 GitHub Pages 部署：删除本文件所有行首的 "# " 即可。
-# ============================================================================
+name: Deploy to GitHub Pages
 
-# name: Deploy to GitHub Pages
-#
-# on:
-#   push:
-#     branches: [ master ]
-#   workflow_dispatch:
-#
-# # Pages 部署需要的权限
-# permissions:
-#   contents: read
-#   pages: write
-#   id-token: write
-#
-# # 确保只有一个部署任务同时运行
-# concurrency:
-#   group: "pages"
-#   cancel-in-progress: false
-#
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v4
-#       - name: Setup Node.js
-#         uses: actions/setup-node@v4
-#         with:
-#           node-version: '22'
-#       - name: Setup pnpm
-#         uses: pnpm/action-setup@v4
-#         with:
-#           version: 11.22.0
-#           run_install: false
-#       - name: Install dependencies
-#         run: pnpm install --no-frozen-lockfile
-#       - name: Build site
-#         run: pnpm run build
-#       - name: Create .nojekyll file
-#         run: touch dist/.nojekyll
-#       - name: Upload artifact
-#         uses: actions/upload-pages-artifact@v3
-#         with:
-#           path: dist
-#
-#   deploy:
-#     environment:
-#       name: github-pages
-#       url: ${{ steps.deployment.outputs.page_url }}
-#     runs-on: ubuntu-latest
-#     needs: build
-#     steps:
-#       - name: Deploy to GitHub Pages
-#         id: deployment
-#         uses: actions/deploy-pages@v4
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+# Pages 部署需要的权限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 确保只有一个部署任务同时运行
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.22.0
+          run_install: false
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build site
+        run: pnpm run build
+
+      - name: Create .nojekyll file
+        run: touch dist/.nojekyll
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist  # Astro默认构建输出目录
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
