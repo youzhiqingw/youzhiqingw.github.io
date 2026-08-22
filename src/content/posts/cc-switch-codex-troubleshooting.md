@@ -1,13 +1,11 @@
 ---
-title: 'CC Switch 配置 Codex 桌面端：问题排查与解决手册'
+title: 'CC Switch 修复 Codex 桌面端：问题排查与解决手册'
 published: 2026-08-22
-description: 'CC Switch 配置 Codex 桌面端切换第三方/国产模型时的常见问题排查手册，涵盖路由断裂、显示异常、认证冲突等场景。'
+description: 'CC Switch 修复 Codex 桌面端桌面端切换第三方/国产模型时的常见问题排查手册，涵盖路由断裂、显示异常、认证冲突等场景。'
 tags: [CC Switch, Codex, 配置, 故障排查]
 category: 技术笔记
 slug: cc-switch-codex-troubleshooting
 ---
-
-> 适用范围：Windows / macOS 上的 Codex 桌面版（Codex App）+ CC Switch 切换第三方/国产模型。 核心认知一句话：**`config.toml` 管模型，`auth.json` 管认证，两个文件同步了就没事；路由问题和显示问题是两回事，先分清再动手。**
 
 ------
 
@@ -15,18 +13,18 @@ slug: cc-switch-codex-troubleshooting
 
 ### 0.1 Codex 的两个核心配置文件
 
-| 文件          | 作用                                    | 典型位置                                                     |
-| ------------- | --------------------------------------- | ------------------------------------------------------------ |
-| `config.toml` | 用什么模型、走哪个 provider、接口协议   | `C:\Users\<用户名>\.codex\config.toml`（Windows）/ `~/.codex/config.toml`（macOS） |
-| `auth.json`   | 认证方式（ChatGPT 官方登录 or API Key） | 同上目录                                                     |
+| 文件          | 作用                                    | 典型位置                                          |
+| ------------- | --------------------------------------- | ------------------------------------------------- |
+| `config.toml` | 用什么模型、走哪个 provider、接口协议   | `C:\Users\<用户名>\.codex\config.toml`（Windows） |
+| `auth.json`   | 认证方式（ChatGPT 官方登录 or API Key） | 同上目录                                          |
 
-CC Switch 帮你切换时**需要同时改这两个文件**，但它有时只改了其中一个——这是至少一半"切换不生效"问题的根源。
+CC Switch 切换时**需要同时改这两个文件**，它有时只改了其中一个——这是至少一半"切换不生效"问题的根源。
 
-**注意多路径陷阱**：如果你安装时改过 Codex 的数据目录（例如 `D:\codex-home`），电脑上可能存在两份 `config.toml`。CC Switch 可能改了 C 盘那份，而 Codex 实际读取的是 D 盘那份。排查时先确认 Codex 真正在读哪个文件。
+如果你安装时改过 Codex 的数据目录（例如 `D:\codex-home`），电脑上可能存在两份 `config.toml`。CC Switch 可能改了 C 盘那份，而 Codex 实际读取的是 D 盘那份。排查时先确认 Codex 真正在读哪个文件。
 
 ### 0.2 路由 vs 显示：两类问题必须分开
 
-- **路由断了**：请求根本送不出去（401/404/400/model-not-found）。这是配置或模型本身的问题，改目录、改 UI 都救不回来。
+- **路由断了**：请求根本送不出去（401/404/400/model-not-found）。这是配置或模型本身的问题。
 - **路由通了但桌面版不显示**：CLI 里 `/model` 能看到模型、请求也正常，只是桌面版选择器看不见。这是显示问题（客户端过滤缺陷），有专门的绕行方案。
 
 **一条命令区分两者**：在同一个文件夹打开终端运行 `codex`（CLI），输入 `/model`。
@@ -113,16 +111,9 @@ cause: Failed to deserialize the JSON body into the target type:
 messages[6]: unknown variant `image_url`, expected `text`
 ```
 
-**根因**：**DeepSeek API 本身不支持图片输入**（识图只在官方网页端/App 开放，API 端没有），与 CC Switch 和你的配置都无关。
+**根因**：**部分模型不支持图片输入**，与 CC Switch 和你的配置都无关。
 
 **最坑的一点**：一旦某会话里发过图片报错，该会话后续**纯文字也会持续报错**——因为 Codex 每次都会把含图片的历史消息一起发给 API。
-
-**解决方案**：
-
-1. 报错的旧会话直接废弃，**新建会话**继续干活。
-2. 长期二选一：
-   - 继续用 DeepSeek → 纯文字编码场景没问题，但**绝不往对话里拖截图**；
-   - 工作流经常要发截图 → 换支持多模态的模型，**Qwen（通义千问）或 Kimi 都支持图片输入**，在 CC Switch 里切换即可。
 
 ### 问题 3：API Key 明明正确，却报 401
 
@@ -236,7 +227,7 @@ model_catalog_json = "C:/Users/你/.codex/my-models.json"
 
 `slug` 必须等于发给 provider 的模型字符串。目录只在**启动时**读取一次，改动后必须重启桌面版。
 
-### 问题 8：选择器下拉列表整个是空的（CC Switch 用户）
+### 问题 8：选择器下拉列表整个是空的
 
 **根因**：早于 **v3.16.5** 的 CC Switch 生成的目录格式与 Codex 选择器期望的对不上（cc-switch issue #3668），路由正常但 `/model` 返回空。
 
@@ -321,48 +312,3 @@ grep -rn "model_providers" ~/.codex/config.toml ./.codex/config.toml 2>/dev/null
    - 国产 → 官方：关 Codex → 禁用供应商 → 关路由 → 开 Codex 重新登录（配置乱了就用备份恢复）。
    - 国产 A → 国产 B：关 Codex → 直接启用新供应商（旧的自动禁用）→ 开 Codex，路由不用动。
 5. **善用本地 agent 排查**：把 `config.toml`、`auth.json` 和备份文件丢给 Claude Code / opencode，让它对比差异并修复，比手动翻文件高效得多。
-6. **遇到疑似工具 bug 去 CC Switch 的 GitHub 提 issue**，社区工具靠反馈迭代。
-
-------
-
-## 七、进阶方案：官方登录 + CPA 共存（可选）
-
-如果你既要第三方模型自由切换、又不想失去官方登录态（官方插件市场、手机远程控制等依赖登录态的功能），可以采用「官方登录 + CLIProxyAPI（CPA）共存」方案：
-
-1. **官方登录**：用 codex-auth-helper 导出已登录会话的 `auth.json`，替换 `~/.codex/auth.json`。
-2. **部署 CPA**：下载 CLIProxyAPI，把 `config.example.yaml` 改名 `config.yaml`、设好 `secret-key`，启动后在 `http://localhost:8317` 管理面板删除默认密钥、自加一个密钥，再添加上游 API。
-3. **配置共存**：`config.toml` 中
-
-```
-model_provider = "custom"
-
-
-[model_providers.custom]
-name = "CloseAI"          # 故意不叫 "OpenAI"，关闭远程压缩
-wire_api = "responses"
-requires_openai_auth = true
-base_url = "http://localhost:8317/v1"
-experimental_bearer_token = "CPA 里设置的密钥"
-```
-
-效果：CPA 里的所有模型出现在 Codex 模型列表可自由切换，官方登录态功能保留，API 请求全部走 CPA、不消耗官方额度。
-
-**注意事项**：
-
-- 某些限定 Codex 客户端直连的中转站，经 CPA 代理后可能不可用。
-- Codex 会用一个小模型给新对话起标题（当前为 `gpt-5.6-luna`），会消耗该模型额度；如 CPA 中没有该模型，可把其他模型映射为 `gpt-5.6-luna`，但该模型必须支持 low 思考等级（实测把 DeepSeek 映射为小模型会报错）。
-- 想看 CPA 的请求与用量分析，可搭配 CPA-Manager-Plus。
-
-------
-
-## 八、已知缺陷时间线（2026）
-
-| Issue               | 问题                                        | 状态                    |
-| ------------------- | ------------------------------------------- | ----------------------- |
-| openai/codex #19694 | 桌面版选择器过滤掉后端已加载的目录模型      | 未关闭（用修复 A 绕行） |
-| openai/codex #26308 | 桌面版新会话忽略项目级 model_catalog_json   | 未关闭                  |
-| openai/codex #22160 | /model 与选择器不暴露 profile/provider 别名 | 已关闭                  |
-| openai/codex #15364 | 桌面版无选择自定义 provider 的 UI           | 已关闭                  |
-| cc-switch #3668     | 目录格式无法被识别，/model 为空             | 已在 v3.16.5 修复       |
-
-**贯穿始终的规律**：路由能用，显示不能用；CLI 永远是最可靠的应急出口。桌面版卡住时，终端里跑 `codex` 几乎总能显示并使用你的模型。
