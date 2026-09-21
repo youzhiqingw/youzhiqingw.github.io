@@ -2,7 +2,7 @@
 title: '网络模拟器选择：仿真器与模拟器怎么选，按认证方向与硬件配置对照选型'
 published: 2026-09-21
 description: '整理主流网络模拟器的选型方法：先区分仿真器与模拟器，再按 CCNA / HCIA-HCIP-HCIE / H3C 认证方向介绍 Packet Tracer、eNSP、HCL、EVE-NG、PNET、GNS3 的适用场景与优缺点，最后给出安装方式、依赖组件与硬件配置前提。'
-tags: [网络, 模拟器, 选型, 学习]
+tags: [网络, 模拟器]
 category: 技术笔记
 slug: network-simulator-selection
 ---

@@ -2,7 +2,7 @@
 title: Hello World
 published: 2026-08-22
 description: 每个人的博客都有第一篇帖子，这就是我的。记录生活，分享技术，持续成长。
-tags: [随笔, 博客, 开张]
+tags: [随笔]
 category: 随笔
 image: ""
 slug: hello-world

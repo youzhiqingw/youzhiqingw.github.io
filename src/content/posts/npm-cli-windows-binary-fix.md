@@ -2,7 +2,7 @@
 title: 'Claude Code 与 OpenCode 的"16 位应用程序"修复笔记'
 published: 2026-08-22
 description: 'Windows 上通过 npm 全局安装的 CLI 工具运行时报"不支持的 16 位应用程序"的通用修复方案，适用于 Claude Code、OpenCode 等 npm 包装器 + 原生 exe 结构的工具。'
-tags: [npm, Windows, CLI, 故障修复]
+tags: [npm, Windows, CLI, 故障排查]
 category: 技术笔记
 slug: npm-cli-windows-binary-fix
 ---
